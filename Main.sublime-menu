@@ -1,0 +1,54 @@
+[
+    {
+        "caption": "Tools",
+        "mnemonic": "T",
+        "id": "tools",
+        "children": [
+            {
+                "caption": "Snipt",
+                "children": [
+                    {
+                        "caption": "Sync Snipts",
+                        "command": "sync_snipts"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "mnemonic": "n", 
+        "caption": "Preferences", 
+        "id": "preferences", 
+        "children": [
+            {
+                "mnemonic": "P", 
+                "caption": "Package Settings", 
+                "id": "package-settings", 
+                "children": [
+                    {
+                        "caption": "Snipt", 
+                        "children": [
+                            {
+                                "caption": "Settings – Default", 
+                                "args": {
+                                    "file": "${packages}/Snipt/Snipt.sublime-settings"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "Settings – User", 
+                                "args": {
+                                    "file": "${packages}/User/Snipt.sublime-settings"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "-"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
