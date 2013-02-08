@@ -35,6 +35,13 @@ def buildSniptURL(id = None):
 	else:
 		return snipt_api_base  + id + "/?username=" + snipt_username + "&api_key=" + snipt_api_key + "&format=json"
 
+# Sync Snipts
+# ---------------------------------------
+# Builds the context menu by pulling in
+# your scripts from Snipt.net
+# @return void
+# ---------------------------------------
+
 class SyncSniptsCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		snipt_url = buildSniptURL()
@@ -55,14 +62,18 @@ class SyncSniptsCommand(sublime_plugin.TextCommand):
 		f = open(sublime.packages_path() + '\Snipt\\Context.sublime-menu', 'w')
 		f.write(context_menu)
 		f.close
+		return
 
 
 class GetSniptCommand(sublime_plugin.TextCommand):
 	def run(self, edit, id):
-		sel = self.view.sel()
 		snipt_url = buildSniptURL(str(id))
+		sel = self.view.sel()
 		snipts = getSnipts(snipt_url);
+		title = snipts['title']
+		author = snipts['user']['username']
+		url = snipts['full_absolute_url']
 		code = snipts['code']
-		for entry in sel:
-			entry.append(code)
+		self.view.replace(edit, sel[0], code)
 		return
+
