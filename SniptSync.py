@@ -13,10 +13,12 @@ snipt_api_key = settings.get('snipt_api_key')
 snipt_username = settings.get('snipt_username')
 symbol_start = {"ASP":"<%--",
 				"HTML":"<!--",
-				"PHP":"/**"}
+				"PHP":"/**",
+				"Text":""}
 symbol_end = {"ASP":"--%>",
 			  "HTML":"<!--",
-			  "PHP":"**/"}
+			  "PHP":"**/",
+			  "Text":""}
 
 # Get Snipts
 # ---------------------------------------
@@ -104,7 +106,6 @@ class GetSniptCommand(sublime_plugin.TextCommand):
 		snipt_url = buildSniptURL(str(id))
 		sel = self.view.sel()
 		syntax_abbreviation = getSyntax( self. view.settings().get('syntax') )
-		comment_symbols = getCommentSymbol(syntax_abbreviation)
 		snipts = getSnipts(snipt_url);
 		title = snipts['title']
 		author = snipts['user']['username']
