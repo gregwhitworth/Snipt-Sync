@@ -84,10 +84,10 @@ class SyncSniptsCommand(sublime_plugin.TextCommand):
 		context_menu += '\n\t\t]'
 		context_menu += '\n\t}'
 		context_menu += '\n]'
-		f = open(sublime.packages_path() + '\Snipt\\Context.sublime-menu', 'w')
+		f = open(sublime.packages_path() + '\SniptSync\\Context.sublime-menu', 'w')
 		f.write(context_menu)
 		f.close
-		self.view.set_status('snipt', 'Snipt: Added ' + str(snipts_count) + ' snippets from your account.')
+		self.view.set_status('snipt', 'Snipt Sync: Added ' + str(snipts_count) + ' snippets from your account.')
 		sublime.set_timeout(lambda: self.view.erase_status('snipt'), 3000)
 		return
 
