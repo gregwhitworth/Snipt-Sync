@@ -11,11 +11,17 @@ import sublime, sublime_plugin, urllib, urllib2, json, re
 settings = sublime.load_settings("Snipt.sublime-settings")
 snipt_api_key = settings.get('snipt_api_key')
 snipt_username = settings.get('snipt_username')
-symbol_start = {"ASP":"<%--",
+symbol_start = {"ActionScript":"/*",
+				"AppleScript":"(*",
+				"ASP":"<%--",
+				"Batch File":"REM",
 				"HTML":"<!--",
 				"PHP":"/**",
 				"Text":""}
-symbol_end = {"ASP":"--%>",
+symbol_end = {"ActionScript":"*/",
+			  "AppleScript":"*)",
+			  "ASP":"--%>",
+			  "Batch File":"",
 			  "HTML":"<!--",
 			  "PHP":"**/",
 			  "Text":""}
@@ -65,10 +71,25 @@ def getSyntax( syntax ):
 # ---------------------------------------
 
 class SyncSniptsCommand(sublime_plugin.TextCommand):
+
+	def buildLexerDict(self,snipts):
+		lexers = snipts[0]['user']['lexers']
+		lexer_dict = {}
+		for lexer in lexers:
+			lexer_dict[lexer] = []
+		return lexer_dict
+
+	def buildSniptsContextDict(self,snipts,lexer_dict):
+		snipts_dict = lexer_dict
+		for snipt in snipts:
+			snipts_dict[snipt['lexer']].append({"id":str(snipt['id']),
+										   "title":snipt['title']})
+		return snipts_dict
+
 	def run(self, edit):
 		snipt_url = buildSniptURL()
 		snipts_count = 1;
-		snipts = getSnipts(snipt_url)		
+		snipts = getSnipts(snipt_url)
 		context_menu = '['
 		context_menu += '\n\t{ "caption": "Snipts", "id": "file", "children":'
 		context_menu += '\n\t\t['
@@ -76,13 +97,24 @@ class SyncSniptsCommand(sublime_plugin.TextCommand):
 			{"caption":"No snipts available"}
 		else:
 			snipts = snipts['objects']
-			for j,snipt in reversed(list(enumerate(reversed(snipts)))):
-				snipts_count += 1
-				get_snipt_temp = '\n\t\t{"command": "get_snipt", "args": {"id":"' + str(snipt['id']) + '"}, "caption": "' + snipt['title'] + '"}'
+			lexers = self.buildLexerDict(snipts)
+			snipts_dict = self.buildSniptsContextDict(snipts, lexers)
+			for j,key in reversed(list(enumerate(reversed(snipts_dict.keys())))):
+				context_menu += '\n\t\t\t{ "caption":"' + key + '", "id": "file", "children":'
+				context_menu += '\n\t\t\t\t['
+				for s, snipt in reversed(list(enumerate(reversed(snipts_dict[key])))):
+					snipts_count += 1
+					get_snipt_temp = '\n\t\t\t\t\t{"command": "get_snipt", "args": {"id":"' + str(snipt['id']) + '"}, "caption": "' + snipt['title'] + '"}'
+					if s == 0:
+						context_menu += get_snipt_temp
+					else:
+						context_menu += get_snipt_temp + ','							
+				context_menu += '\n\t\t\t\t]' # End Lexer
+				context_menu += '\n\t\t\t}' # End Lexer
 				if j == 0:
-					context_menu += get_snipt_temp
+					context_menu += ''
 				else:
-					context_menu += get_snipt_temp + ','
+					context_menu += ','	
 		context_menu += '\n\t\t]'
 		context_menu += '\n\t}'
 		context_menu += '\n]'
@@ -107,6 +139,7 @@ class GetSniptCommand(sublime_plugin.TextCommand):
 		sel = self.view.sel()
 		syntax_abbreviation = getSyntax( self. view.settings().get('syntax') )
 		snipts = getSnipts(snipt_url);
+		print syntax_abbreviation
 		title = snipts['title']
 		author = snipts['user']['username']
 		snipt_id = snipts['id']
