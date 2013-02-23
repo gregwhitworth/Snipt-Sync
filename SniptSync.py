@@ -6,9 +6,9 @@
 # @version   1.0
 # =======================================================
 
-import sublime, sublime_plugin, urllib, urllib2, json, re
+import sublime, sublime_plugin, urllib, urllib2, json, re, time, threading
 
-settings = sublime.load_settings("Snipt.sublime-settings")
+settings = sublime.load_settings("SniptSync.sublime-settings")
 snipt_api_key = settings.get('snipt_api_key')
 snipt_username = settings.get('snipt_username')
 symbol_start = {"ActionScript":"/*",
@@ -71,6 +71,23 @@ def getSyntax( syntax ):
 # ---------------------------------------
 
 class SyncSniptsCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		syncsnippetsThread = SyncSniptsThread(self, edit)
+		syncsnippetsThread.start()
+	
+
+# Sync Snipts Thread
+# ---------------------------------------
+# This does most of the heavy lifting but
+# places it in a thread so that it doesn't
+# crash Sublime.
+# @return void
+# ---------------------------------------
+class SyncSniptsThread(threading.Thread):
+	def __init__(self, cmd, edit):
+		threading.Thread.__init__(self)
+		self.cmd = cmd
+		self.edit = edit
 
 	def buildLexerDict(self,snipts):
 		lexers = snipts[0]['user']['lexers']
@@ -86,8 +103,9 @@ class SyncSniptsCommand(sublime_plugin.TextCommand):
 										   "title":snipt['title']})
 		return snipts_dict
 
-	def run(self, edit):
+	def run(self):
 		snipt_url = buildSniptURL()
+		print snipt_url
 		snipts_count = 1;
 		snipts = getSnipts(snipt_url)
 		context_menu = '['
@@ -121,9 +139,11 @@ class SyncSniptsCommand(sublime_plugin.TextCommand):
 		f = open(sublime.packages_path() + '\SniptSync\\Context.sublime-menu', 'w')
 		f.write(context_menu)
 		f.close
-		self.view.set_status('snipt', 'Snipt Sync: Added ' + str(snipts_count) + ' snippets from your account.')
-		sublime.set_timeout(lambda: self.view.erase_status('snipt'), 3000)
 		return
+
+	def callback(self, snippets_count):
+		self.cmd.view.set_status('snippet', 'snippet Sync: Added ' + str(snippets_count)  + ' snippets from your account.')
+		sublime.set_timeout(lambda: self.cmd.view.erase_status('snippet'), 3000)
 
 # Get Snipt
 # ---------------------------------------

@@ -29,16 +29,9 @@
                         "caption": "Snipt Sync", 
                         "children": [
                             {
-                                "caption": "Settings – Default", 
-                                "args": {
-                                    "file": "${packages}/Snipt/Snipt.sublime-settings"
-                                }, 
-                                "command": "open_file"
-                            }, 
-                            {
                                 "caption": "Settings – User", 
                                 "args": {
-                                    "file": "${packages}/User/Snipt.sublime-settings"
+                                    "file": "${packages}/User/SniptSync.sublime-settings"
                                 }, 
                                 "command": "open_file"
                             }, 
