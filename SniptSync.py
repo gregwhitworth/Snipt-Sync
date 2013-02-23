@@ -105,7 +105,6 @@ class SyncSniptsThread(threading.Thread):
 
 	def run(self):
 		snipt_url = buildSniptURL()
-		print snipt_url
 		snipts_count = 1;
 		snipts = getSnipts(snipt_url)
 		context_menu = '['
@@ -159,7 +158,6 @@ class GetSniptCommand(sublime_plugin.TextCommand):
 		sel = self.view.sel()
 		syntax_abbreviation = getSyntax( self. view.settings().get('syntax') )
 		snipts = getSnipts(snipt_url);
-		print syntax_abbreviation
 		title = snipts['title']
 		author = snipts['user']['username']
 		snipt_id = snipts['id']
